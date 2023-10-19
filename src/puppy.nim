@@ -40,7 +40,8 @@ proc newRequest*(
   url: string,
   verb = "get",
   headers = emptyHttpHeaders(),
-  timeout: float32 = 60
+  timeout: float32 = 60,
+  ident = (cert: "", key: "")
 ): Request =
   ## Allocates a new request object with defaults.
   result = Request()
@@ -48,21 +49,24 @@ proc newRequest*(
   result.verb = verb
   result.headers = headers
   result.timeout = timeout
+  result.ident = ident
 
 proc get*(
   url: string,
   headers = emptyHttpHeaders(),
-  timeout: float32 = 60
+  timeout: float32 = 60,
+  ident = (cert: "", key: "")
 ): Response =
-  fetch(newRequest(url, "GET", headers, timeout))
+  fetch(newRequest(url, "GET", headers, timeout, ident))
 
 proc post*(
   url: string,
   headers = emptyHttpHeaders(),
   body: sink string = "",
-  timeout: float32 = 60
+  timeout: float32 = 60,
+  ident = (cert: "", key: "")
 ): Response =
-  let request = newRequest(url, "POST", headers, timeout)
+  let request = newRequest(url, "POST", headers, timeout, ident)
   request.body = body
   fetch(request)
 
@@ -70,9 +74,10 @@ proc put*(
   url: string,
   headers = emptyHttpHeaders(),
   body: sink string = "",
-  timeout: float32 = 60
+  timeout: float32 = 60,
+  ident = (cert: "", key: "")
 ): Response =
-  let request = newRequest(url, "PUT", headers, timeout)
+  let request = newRequest(url, "PUT", headers, timeout, ident)
   request.body = body
   fetch(request)
 
@@ -80,32 +85,39 @@ proc patch*(
   url: string,
   headers = emptyHttpHeaders(),
   body: sink string = "",
-  timeout: float32 = 60
+  timeout: float32 = 60,
+  ident = (cert: "", key: "")
 ): Response =
-  let request = newRequest(url, "PATCH", headers, timeout)
+  let request = newRequest(url, "PATCH", headers, timeout, ident)
   request.body = body
   fetch(request)
 
 proc delete*(
   url: string,
   headers = emptyHttpHeaders(),
-  timeout: float32 = 60
+  timeout: float32 = 60,
+  ident = (cert: "", key: "")
 ): Response =
-  fetch(newRequest(url, "DELETE", headers, timeout))
+  fetch(newRequest(url, "DELETE", headers, timeout, ident))
 
 proc head*(
   url: string,
   headers = emptyHttpHeaders(),
-  timeout: float32 = 60
+  timeout: float32 = 60,
+  ident = (cert: "", key: "")
 ): Response =
-  fetch(newRequest(url, "HEAD", headers, timeout))
+  fetch(newRequest(url, "HEAD", headers, timeout, ident))
 
-proc fetch*(url: string, headers = emptyHttpHeaders()): string =
+proc fetch*(
+  url: string,
+  headers = emptyHttpHeaders(),
+  ident = (cert: "", key: "")
+): string =
   ## Simple fetch that directly returns the GET response body.
   ## Raises an exception if anything goes wrong or if the response code
   ## is not 200. See get, post, put etc for similar calls that return
   ## a response object.
-  let res = get(url, headers)
+  let res = get(url, headers, ident = ident)
   if res.code == 200:
     return res.body
   raise newException(PuppyError,
