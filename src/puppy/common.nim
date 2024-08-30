@@ -15,6 +15,7 @@ type
       # If you want to use this on Mac, please us -d:puppyLibcurl
       allowAnyHttpsCertificate*: bool
     ident*: tuple[cert, key: string]
+    proxy*: string
 
   Response* = ref object
     headers*: HttpHeaders

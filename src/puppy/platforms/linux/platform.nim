@@ -50,6 +50,8 @@ proc internalFetch*(req: Request): Response {.raises: [PuppyError].} =
       discard curl.easy_setopt(OPT_SSLCERT, req.ident.cert.cstring)
       if req.ident.key != "":
         discard curl.easy_setopt(OPT_SSLKEY, req.ident.key.cstring)
+    if req.proxy != "":
+      discard curl.easy_setopt(OPT_PROXY, req.proxy.cstring)
 
     # Create the Pslist for passing headers to curl manually. This is to
     # avoid needing to call slist_free_all which creates problems
